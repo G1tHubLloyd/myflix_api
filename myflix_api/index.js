@@ -5,7 +5,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 
 const Models = require('./models.js');
-const Movies = Models.Movie; // import once
+const Movies = Models.Movie;
+const Users = Models.User;
 
 const app = express();
 
@@ -22,23 +23,60 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/myFlixDB'
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
 
-// ✅ Get all movies
+// ✅ User routes
+// Create new user
+app.post('/users', async (req, res) => {
+    try {
+        const newUser = await Users.create(req.body);
+        res.status(201).json(newUser);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ✅ Get all users (without passwords)
+app.get('/users', async (req, res) => {
+    try {
+        const users = await Users.find().select('-Password');
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Add a Movie to a User’s Favorites
+app.post('/users/:id/movies/:movieId', async (req, res) => {
+    try {
+        const user = await Users.findByIdAndUpdate(
+            req.params.id,
+            { $push: { FavoriteMovies: req.params.movieId } },
+            { new: true }
+        );
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ✅ Movie routes
+// Get all movies
 app.get('/movies', async (req, res) => {
     try {
         const movies = await Movies.find();
         res.json(movies);
     } catch (err) {
-        res.status(500).send(err.message);
+        res.status(500).json({ error: err.message });
     }
 });
 
-// ✅ Add new movie
+// Add new movie
 app.post('/movies', async (req, res) => {
     try {
         const movie = await Movies.create(req.body);
         res.status(201).json(movie);
     } catch (err) {
-        res.status(500).send(err.message);
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -46,39 +84,12 @@ app.post('/movies', async (req, res) => {
 app.get('/movies/:id', async (req, res) => {
     try {
         const movie = await Movies.findById(req.params.id);
-        if (!movie) {
-            return res.status(404).send('Movie not found');
-        }
+        if (!movie) return res.status(404).json({ error: 'Movie not found' });
         res.json(movie);
     } catch (err) {
-        res.status(500).send(err.message);
+        res.status(500).json({ error: err.message });
     }
 });
-
-// Add a New User
-app.post('/users', async (req, res) => {
-  try {
-    const user = await Users.create(req.body);
-    res.status(201).json(user);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
-
-// Add a Movie to a User’s Favorites
-app.post('/users/:id/movies/:movieId', async (req, res) => {
-  try {
-    const user = await Users.findByIdAndUpdate(
-      req.params.id,
-      { $push: { FavoriteMovies: req.params.movieId } },
-      { new: true }
-    );
-    res.json(user);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
-
 
 // Root endpoint
 app.get('/', (req, res) => {
