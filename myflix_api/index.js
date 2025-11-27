@@ -154,6 +154,19 @@ app.put('/users/:id', async (req, res) => {
     }
 });
 
+// Delete a user by ID
+app.delete('/users/:id', async (req, res) => {
+    try {
+        const user = await Users.findByIdAndDelete(req.params.id);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        const resp = user.toObject ? user.toObject() : user;
+        if (resp.Password) delete resp.Password;
+        res.json({ message: 'User deleted', user: resp });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
     res.send('Welcome to myFlix API!');
