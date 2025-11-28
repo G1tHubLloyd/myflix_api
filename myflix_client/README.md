@@ -1,6 +1,13 @@
 # myFlix Client (minimal)
 
-This folder contains a minimal React client that fetches movies from the myFlix API at `http://localhost:8080/movies`.
+This folder contains a minimal React client that fetches movies from the myFlix API. By default it uses the Vite env variable `VITE_API_BASE`.
+If you want the client to use your Heroku deployment, create a `.env` file in `myflix_client` with:
+
+```
+VITE_API_BASE=https://lloydapi.herokuapp.com
+```
+
+When not set, the client falls back to `http://localhost:8080`.
 
 Quick start:
 
@@ -25,7 +32,7 @@ cd ../../myflix_client
 npm start
 ```
 
-Open `http://localhost:5173` (Vite default) to view the app.
+Open `http://localhost:5173` (Vite default) to view the app. Restart the Vite dev server after changing `.env` so it picks up the new value.
 
 Notes:
 - The app initializes `movies` as an empty array and populates it via `fetch` to `/movies`.
