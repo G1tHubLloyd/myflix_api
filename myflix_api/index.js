@@ -83,7 +83,7 @@ app.post('/users/:id/movies/:movieId', async (req, res) => {
             req.params.id,
             { $push: { FavoriteMovies: req.params.movieId } },
             { new: true }
-        );
+        ).populate('FavoriteMovies');
         if (!user) return res.status(404).json({ error: 'User not found' });
         res.json(user);
     } catch (err) {
