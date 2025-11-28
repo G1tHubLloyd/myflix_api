@@ -31,3 +31,28 @@ body {
 .error {
     color: crimson
 }
+
+/* Modal styles for edit form */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+.modal {
+    background: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+    min-width: 320px;
+    max-width: 90%;
+}
+.modal input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin-top: 6px;
+}
